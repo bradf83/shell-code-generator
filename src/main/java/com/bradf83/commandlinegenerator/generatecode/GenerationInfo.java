@@ -16,6 +16,7 @@ public class GenerationInfo {
     String modelName;
     List<TableColumn> tableColumns = new ArrayList<>();
     List<String> warnings = new ArrayList<>();
+    private boolean queryDsl;
 
     public GenerationInfo addTableColumn(TableColumn tableColumn){
         this.tableColumns.add(tableColumn);

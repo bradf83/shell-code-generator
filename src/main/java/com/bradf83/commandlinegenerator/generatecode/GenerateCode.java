@@ -62,11 +62,16 @@ public class GenerateCode {
             tableColumn.setBeanFieldName(this.getInput("What is the bean field name for the [" + tableColumn.getDatabaseColumnName() + "] column"));
         }
 
+        // Include Query DSL
+        String queryDslInput = this.getInput("Do you want the repository to include query dsl (y, yes, n, no)");
+        generationInfo.setQueryDsl(queryDslInput.equalsIgnoreCase("Y") || queryDslInput.equalsIgnoreCase("yes"));
+
         generationInfo
                 .sortTableColumns()
                 .writeModelInfoToConsole();
 
         this.writeModelFile(generationInfo);
+        this.writeRepositoryFile(generationInfo);
 
         return "Generation complete.";
     }
@@ -104,15 +109,10 @@ public class GenerateCode {
      * @throws Exception an exception if an unprocessable error occurs (file exists)
      */
     private void writeModelFile(GenerationInfo generationInfo) throws Exception {
-        File modelDirectory = new File(this.modelDirectory);
-
-        File modelFile = new File(modelDirectory, generationInfo.modelName + ".java");
+        File modelFile = new File(this.modelDirectory, generationInfo.modelName + ".java");
         if(modelFile.exists()){
             throw new RuntimeException("The model file you are trying to generate already exists.");
         }
-
-        // package
-        String modelPackage = "com.bradf83.model";
 
         // imports
         // TODO: Additional imports may be needed.  This will cover most cases.
@@ -132,7 +132,7 @@ public class GenerateCode {
         annotations.add("@ToString(onlyExplicitlyIncluded = true)");
 
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(modelFile, true))){
-            writer.write("package " + modelPackage + ";");
+            writer.write("package " + this.modelPackage + ";");
             writer.newLine();
             writer.newLine();
             for (String anImport : imports) {
@@ -186,11 +186,90 @@ public class GenerateCode {
         return input;
     }
 
-    private void writeRepositoryFile(GenerationInfo generationInfo) {
-        // TODO:
-        //  repository package
-        //  repository folder
-        //  indicator for query dsl
+    private void writeRepositoryFile(GenerationInfo generationInfo) throws Exception {
+
+        File repositoryFile = new File(this.repositoryDirectory, generationInfo.getModelName() + "Repository.java");
+        if(repositoryFile.exists()){
+            throw new RuntimeException("The repository file you are trying to generate already exists.");
+        }
+
+        // imports
+        List<String> imports = new ArrayList<>();
+        imports.add(this.modelPackage + "." + generationInfo.getModelName());
+        imports.add("org.springframework.data.jpa.repository.JpaRepository;");
+        imports.add("org.springframework.data.rest.core.annotation.RepositoryRestResource");
+        if(generationInfo.isQueryDsl()){
+            imports.add("org.springframework.data.querydsl.QuerydslPredicateExecutor");
+        }
+
+        // annotations
+        List<String> annotations = new ArrayList<>();
+        annotations.add("@RepositoryRestResource");
+
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter(repositoryFile, true))) {
+            writer.write("package " + this.repositoryPackage + ";");
+            writer.newLine();
+            writer.newLine();
+            for (String anImport : imports) {
+                writer.write("import " + anImport + ";");
+                writer.newLine();
+            }
+            writer.newLine();
+            for (String annotation : annotations) {
+                writer.write(annotation);
+                writer.newLine();
+            }
+
+            String interfaceDefinition = "";
+            interfaceDefinition += "public interface " + generationInfo.getModelName();
+            interfaceDefinition += " extends JpaRepository<" + generationInfo.getModelName() + ", Long>";
+            if (generationInfo.isQueryDsl()) {
+                interfaceDefinition += ", QuerydslPredicateExecutor<" + generationInfo.getModelName() + ">";
+            }
+            interfaceDefinition += " {";
+            writer.write(interfaceDefinition);
+            writer.newLine();
+            writer.newLine();
+            writer.write("\t// TODO: Here is a basic insert statement");
+            writer.newLine();
+
+            StringBuilder basicInsert = new StringBuilder();
+            basicInsert.append("INSERT INTO ").append(generationInfo.getTableName());
+            basicInsert.append(" (");
+            for (int i = 0; i < generationInfo.getTableColumns().size(); i++) {
+                if(i != 0){
+                    basicInsert.append(", ");
+                }
+                basicInsert.append(generationInfo.getTableColumns().get(i).getDatabaseColumnName());
+            }
+            basicInsert.append(") VALUES (");
+            for (int i = 0; i < generationInfo.getTableColumns().size(); i++) {
+                if(i != 0){
+                    basicInsert.append(", ");
+                }
+                switch(databaseOperations.determineJavaType(generationInfo.getTableColumns().get(i))){
+                    case "String":
+                        basicInsert.append("'some string'");
+                        break;
+                    case "Double":
+                        basicInsert.append("0.00");
+                        break;
+                    case "Long":
+                        basicInsert.append("1");
+                        break;
+                    case "Instant":
+                        basicInsert.append("'2001-01-01 00:00:00'");
+                        break;
+                    default:
+                        throw new RuntimeException("Unable to determine java type for basic insert.");
+                }
+            }
+            basicInsert.append(");");
+            writer.write("\t");
+            writer.write(basicInsert.toString());
+            writer.newLine();
+            writer.write("}");
+        }
     }
 
     private void writeControllerTestFile(GenerationInfo generationInfo){

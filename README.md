@@ -35,10 +35,10 @@ In development but definitely usable already.
 **Does**
 
 - Generate a model
+- Generate a repository
 
 **Coming soon**
 
-- Generate a repository
 - Generate a test controller
 
 ## Additional Links
@@ -49,5 +49,5 @@ Some resources that helped me build this solution.
 
 ## TODO
 
-- Generate repository, tests construct
+- Generate tests
 - If the model exists allow the user to rename? overwrite?
