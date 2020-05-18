@@ -18,11 +18,7 @@ import java.util.List;
 public class GenerateCode {
     private final InputReader inputReader;
 
-    // User selects the database at runtime
-    // TODO: It would be nice for this to be based on configuration and the application just pick the appropriate one
-    private final OracleDatabaseOperations oracleDatabaseOperations;
-    private final PostgreSQLDatabaseOperations postgreSQLDatabaseOperations;
-    private DatabaseOperations selectedDatabaseOperations;
+    private final DatabaseOperations databaseOperations;
 
     // TODO: Convert to use configuration properties class and inject it
     @Value("${generator.model.package:''}")
@@ -42,23 +38,10 @@ public class GenerateCode {
     public String generateCode() throws Exception {
         this.validateConfiguration();
 
-        String database = getInput("What database? [Oracle, PostgreSQL]");
-
-        switch(database.toLowerCase()){
-            case "oracle":
-                this.selectedDatabaseOperations = this.oracleDatabaseOperations;
-                break;
-            case "postgresql":
-                this.selectedDatabaseOperations = this.postgreSQLDatabaseOperations;
-                break;
-            default:
-                return "The database you chose is not supported";
-        }
-
         String table = getInput("What is the name of the table you wish to generate code for?  Remember this could be case sensitive");
 
         // Look for table information
-        List<TableColumn> tableColumns = this.selectedDatabaseOperations.lookupTableColumns(table);
+        List<TableColumn> tableColumns = this.databaseOperations.lookupTableColumns(table);
 
         if(tableColumns.size() == 0){
             return "The table " + table + " was not found.";
@@ -68,7 +51,7 @@ public class GenerateCode {
         generationInfo.setTableName(table);
         generationInfo.addTableColumns(tableColumns);
         // Determine Primary Key
-        generationInfo.setPrimaryKey(this.selectedDatabaseOperations.lookupPrimaryKeys(table));
+        generationInfo.setPrimaryKey(this.databaseOperations.lookupPrimaryKeys(table));
         // Class Name
         generationInfo.setModelName(this.getInput("What is the name of the model for this table"));
         // Ensure the first letter is capital
@@ -173,7 +156,7 @@ public class GenerateCode {
                 }
                 writer.write("\t@Column(name = \"" + field.getDatabaseColumnName() + "\")");
                 writer.newLine();
-                writer.write("\tprivate " + this.selectedDatabaseOperations.determineJavaType(field) + " " + field.getBeanFieldName() + ";");
+                writer.write("\tprivate " + this.databaseOperations.determineJavaType(field) + " " + field.getBeanFieldName() + ";");
                 writer.newLine();
                 writer.newLine();
             }

@@ -21,8 +21,8 @@ Injection.
 
 ## How To Use
 
-Ensure you have a datasource configured in `application.properties`.  The `JdbcTemplate's` will fail to inject
-without one.  
+Ensure you have a datasource configured in `application.properties`.  The DatabaseOperations implementation is 
+determined based on the `spring.datasource.url` property.
 
 Also make sure to configure your `model`, `repository` and `controller-tests` properties.
 
@@ -50,5 +50,4 @@ Some resources that helped me build this solution.
 ## TODO
 
 - Generate repository, tests construct
-- Choose database based on configuration
 - If the model exists allow the user to rename? overwrite?

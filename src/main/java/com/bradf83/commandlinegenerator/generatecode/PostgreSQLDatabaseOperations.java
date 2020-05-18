@@ -1,6 +1,7 @@
 package com.bradf83.commandlinegenerator.generatecode;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@ConditionalOnExpression("#{'${spring.datasource.url}'.contains('postgresql')}")
 public class PostgreSQLDatabaseOperations implements DatabaseOperations {
 
     private final JdbcTemplate jdbcTemplate;
