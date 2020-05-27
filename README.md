@@ -32,6 +32,16 @@ all other commands are commands I used to learn the framework or were given by d
 
 In development but definitely usable already.
 
+## Issues
+
+I used this for the first time on an Oracle database and ran into the following issues:
+
+- Spring Data JDBC 2.0 (Came with Spring Boot 2.3.0) does not contain an Oracle Dialect.
+    - More information can be found in this blog post [here](https://spring.io/blog/2020/05/20/migrating-to-spring-data-jdbc-2-0)
+    - Downgrading to Spring Boot 2.2.7 instead could be a quick fix to this problem for now.
+- The `nullable` column in Oracle comes back as a `Y` or `N` and does not map properly.
+    - Set to `true` for now and add a TODO
+
 **Does**
 
 - Generate a model

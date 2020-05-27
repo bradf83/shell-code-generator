@@ -2,13 +2,11 @@ package com.bradf83.commandlinegenerator.generatecode;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -30,7 +28,7 @@ public class OracleDatabaseOperations implements DatabaseOperations {
     @Override
     public List<TableColumn> lookupTableColumns(String table) {
         List<TableColumn> results;
-        results = jdbcTemplate.query("SELECT column_name databaseColumnName, data_type type, data_length length, data_precision precision, data_scale scale, nullable nullable FROM all_tab_columns WHERE table_name = '" + table + "'", new BeanPropertyRowMapper<>(TableColumn.class));
+        results = jdbcTemplate.query("SELECT column_name databaseColumnName, data_type type, data_length length, data_precision precision, data_scale scale, 'true' nullable FROM all_tab_columns WHERE table_name = '" + table + "'", new BeanPropertyRowMapper<>(TableColumn.class));
         return results;
     }
 

@@ -221,7 +221,7 @@ public class GenerateCode {
             }
 
             String interfaceDefinition = "";
-            interfaceDefinition += "public interface " + generationInfo.getModelName();
+            interfaceDefinition += "public interface " + generationInfo.getModelName() + "Repository";
             interfaceDefinition += " extends JpaRepository<" + generationInfo.getModelName() + ", Long>";
             if (generationInfo.isQueryDsl()) {
                 interfaceDefinition += ", QuerydslPredicateExecutor<" + generationInfo.getModelName() + ">";
@@ -234,7 +234,7 @@ public class GenerateCode {
             writer.newLine();
 
             StringBuilder basicInsert = new StringBuilder();
-            basicInsert.append("INSERT INTO ").append(generationInfo.getTableName());
+            basicInsert.append("\t// INSERT INTO ").append(generationInfo.getTableName());
             basicInsert.append(" (");
             for (int i = 0; i < generationInfo.getTableColumns().size(); i++) {
                 if(i != 0){
