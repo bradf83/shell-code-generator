@@ -38,9 +38,7 @@ I used this for the first time on an Oracle database and ran into the following 
 
 - Spring Data JDBC 2.0 (Came with Spring Boot 2.3.0) does not contain an Oracle Dialect.
     - More information can be found in this blog post [here](https://spring.io/blog/2020/05/20/migrating-to-spring-data-jdbc-2-0)
-    - Downgrading to Spring Boot 2.2.7 instead could be a quick fix to this problem for now.
-- The `nullable` column in Oracle comes back as a `Y` or `N` and does not map properly.
-    - Set to `true` for now and add a TODO
+    - Downgrading to Spring Boot 2.2.9 instead could be a quick fix to this problem for now.
 
 **Does**
 
@@ -50,6 +48,12 @@ I used this for the first time on an Oracle database and ran into the following 
 **Coming soon**
 
 - Generate a test controller
+
+## Notes
+
+- To use with Oracle
+  - Add the Oracle JAR, tested with 11.2.0.4
+  - Add the repository to get the Oracle JAR from.
 
 ## Additional Links
 
@@ -61,3 +65,5 @@ Some resources that helped me build this solution.
 
 - Generate tests
 - If the model exists allow the user to rename? overwrite?
+- Handle nullable column in Oracle (`Y` or `N`)
+

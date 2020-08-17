@@ -28,7 +28,7 @@ public class OracleDatabaseOperations implements DatabaseOperations {
     @Override
     public List<TableColumn> lookupTableColumns(String table) {
         List<TableColumn> results;
-        results = jdbcTemplate.query("SELECT column_name databaseColumnName, data_type type, data_length length, data_precision precision, data_scale scale, 'true' nullable FROM all_tab_columns WHERE table_name = '" + table + "'", new BeanPropertyRowMapper<>(TableColumn.class));
+        results = jdbcTemplate.query("SELECT column_name databaseColumnName, data_type type, data_length length, data_precision precision, data_scale scale, 'true' FROM all_tab_columns WHERE table_name = '" + table + "'", new BeanPropertyRowMapper<>(TableColumn.class));
         return results;
     }
 
@@ -39,15 +39,20 @@ public class OracleDatabaseOperations implements DatabaseOperations {
             case "DATE":
                 return "Instant";
             case "NUMBER":
-                // TODO: More edge cases here but this will cover most cases.
-                //  Integers will be classified longs in some cases here.
-                if(tableColumn.getPrecision() <= 12 && tableColumn.getScale() == 0) {
-                    return "Long";
+                //TODO: If precision is null use an Int, log a message
+                try {
+                    // TODO: More edge cases here but this will cover most cases.
+                    //  Integers will be classified longs in some cases here.
+                    if (tableColumn.getPrecision() <= 12 && tableColumn.getScale() == 0) {
+                        return "Long";
+                    }
+                    if (tableColumn.getScale() > 0) {
+                        return "Double";
+                    }
                 }
-                if(tableColumn.getScale() > 0) {
-                    return "Double";
+                catch(Exception e){
+                    return "Unknown";
                 }
-                throw new RuntimeException("Unable to determine type for table column [" + tableColumn.getDatabaseColumnName() + "]");
             case "VARCHAR2":
                 // TODO: Depending on the size you may want something bigger than a String, but will handle most cases.
                 return "String";

@@ -72,6 +72,7 @@ public class GenerateCode {
 
         this.writeModelFile(generationInfo);
         this.writeRepositoryFile(generationInfo);
+        this.writeControllerTestFile(generationInfo);
 
         return "Generation complete.";
     }
@@ -196,7 +197,7 @@ public class GenerateCode {
         // imports
         List<String> imports = new ArrayList<>();
         imports.add(this.modelPackage + "." + generationInfo.getModelName());
-        imports.add("org.springframework.data.jpa.repository.JpaRepository;");
+        imports.add("org.springframework.data.jpa.repository.JpaRepository");
         imports.add("org.springframework.data.rest.core.annotation.RepositoryRestResource");
         if(generationInfo.isQueryDsl()){
             imports.add("org.springframework.data.querydsl.QuerydslPredicateExecutor");
@@ -247,6 +248,7 @@ public class GenerateCode {
                 if(i != 0){
                     basicInsert.append(", ");
                 }
+                //TODO: If precision is null use an Int, log a message
                 switch(databaseOperations.determineJavaType(generationInfo.getTableColumns().get(i))){
                     case "String":
                         basicInsert.append("'some string'");
@@ -272,11 +274,39 @@ public class GenerateCode {
         }
     }
 
-    private void writeControllerTestFile(GenerationInfo generationInfo){
-        // TODO:
-        //  test controller package
-        //  test controller folder
-        //  plural name for model
-        //  base test class import
+    private void writeControllerTestFile(GenerationInfo generationInfo) throws Exception {
+
+        File controllerTestsFile = new File(this.controllerTestsDirectory, generationInfo.getModelName() + "ControllerTests.java");
+        if(controllerTestsFile.exists()){
+            throw new RuntimeException("The controller tests file you are trying to generate already exists.");
+        }
+
+        // imports
+        List<String> imports = new ArrayList<>();
+        imports.add("org.junit.Test");
+
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter(controllerTestsFile, true))) {
+            writer.write("package " + this.controllerTestsPackage + ";");
+            writer.newLine();
+            writer.newLine();
+            for (String anImport : imports) {
+                writer.write("import " + anImport + ";");
+                writer.newLine();
+            }
+            writer.newLine();
+
+            String classDefinition = "";
+            classDefinition += "public class " + generationInfo.getModelName() + "ControllerTests";
+            classDefinition += " {";
+            writer.write(classDefinition);
+            writer.newLine();
+            writer.newLine();
+            writer.write("\t// TODO: Extend Base Class");
+            writer.newLine();
+            writer.write("\t// TODO: Add tests");
+            writer.newLine();
+
+            writer.write("}");
+        }
     }
 }
