@@ -40,11 +40,11 @@ $ mvn spring-boot:run
 
 # from the spring-boot terminal
 # help will show you the commands
-> help
+Generator:> help
 
 # gc will generate a model class, controller, and repository
 # follow the prompts
-> gc
+Generator:> gc
 ```
 
 ## Issues
