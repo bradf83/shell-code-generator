@@ -32,6 +32,21 @@ all other commands are commands I used to learn the framework or were given by d
 
 In development but definitely usable already.
 
+### Example
+
+```terminal
+# run the command line application
+$ mvn spring-boot:run
+
+# from the spring-boot terminal
+# help will show you the commands
+Generator:> help
+
+# gc will generate a model class, controller, and repository
+# follow the prompts
+Generator:> gc
+```
+
 ## Issues
 
 I used this for the first time on an Oracle database and ran into the following issues:
